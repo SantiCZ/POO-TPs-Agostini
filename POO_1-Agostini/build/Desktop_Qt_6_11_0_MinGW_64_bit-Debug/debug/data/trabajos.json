@@ -1,0 +1,14 @@
+[
+    {
+        "createdAt": "2026-03-26T13:27:16",
+        "descripcion": "preparar una exposicion de ecuaciones diferenciales exactas",
+        "estado": "Entregado",
+        "fechaEntrega": "2026-06-10",
+        "id": "a10f43ad-8672-4ff8-a798-3274be013e03",
+        "nombre": "AM-III",
+        "notas": "",
+        "prioridad": "Alta",
+        "updatedAt": "2026-03-26T13:28:10",
+        "usuario": "santiago"
+    }
+]

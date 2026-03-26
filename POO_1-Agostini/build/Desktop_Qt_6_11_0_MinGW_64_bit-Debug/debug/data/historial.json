@@ -1,0 +1,72 @@
+[
+    {
+        "accion": "Editar TP",
+        "detalle": "Se editó \"AM-III\"",
+        "id": "9104dc9e-52da-43f4-b4a0-e2eef766b258",
+        "timestamp": "2026-03-26T13:28:10",
+        "usuario": "santiago"
+    },
+    {
+        "accion": "Login",
+        "detalle": "Sesión iniciada",
+        "id": "0cde4ce9-3004-443f-be53-8bc38adf7138",
+        "timestamp": "2026-03-26T13:27:59",
+        "usuario": "santiago"
+    },
+    {
+        "accion": "Crear TP",
+        "detalle": "Se creó \"AM-III\"",
+        "id": "a6144d3a-7499-4714-9997-51e4dd20e5c2",
+        "timestamp": "2026-03-26T13:27:16",
+        "usuario": "santiago"
+    },
+    {
+        "accion": "Login",
+        "detalle": "Sesión iniciada",
+        "id": "e2837fd0-b08a-4de5-ae75-e27cb97308fa",
+        "timestamp": "2026-03-26T13:22:32",
+        "usuario": "santiago"
+    },
+    {
+        "accion": "Eliminar TP",
+        "detalle": "Se eliminó \"AM 3\"",
+        "id": "5687d56a-90ed-4d6d-8ee8-7255da2474ce",
+        "timestamp": "2026-03-26T12:59:58",
+        "usuario": "alumno"
+    },
+    {
+        "accion": "Editar TP",
+        "detalle": "Se editó \"AM 3\"",
+        "id": "53db857b-a732-4e6a-b414-a8b503b280fc",
+        "timestamp": "2026-03-26T12:59:43",
+        "usuario": "alumno"
+    },
+    {
+        "accion": "Crear TP",
+        "detalle": "Se creó \"AM 3\"",
+        "id": "f5b92278-95b4-44e2-9264-06347cbe7851",
+        "timestamp": "2026-03-26T12:59:18",
+        "usuario": "alumno"
+    },
+    {
+        "accion": "Login",
+        "detalle": "Sesión iniciada",
+        "id": "224b452f-09d7-4155-a828-b918a823d9c4",
+        "timestamp": "2026-03-26T12:58:14",
+        "usuario": "alumno"
+    },
+    {
+        "accion": "Logout",
+        "detalle": "Sesión cerrada manualmente",
+        "id": "404db34c-202f-4105-be32-d7ec826c8bc4",
+        "timestamp": "2026-03-26T12:57:04",
+        "usuario": "alumno"
+    },
+    {
+        "accion": "Login",
+        "detalle": "Sesión iniciada",
+        "id": "c4648ccd-21a6-48dd-a9ed-847d7f4f262b",
+        "timestamp": "2026-03-26T12:56:47",
+        "usuario": "alumno"
+    }
+]
