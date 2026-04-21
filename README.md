@@ -6,5 +6,5 @@
 -un programa que crea un lienzo colaborativo en tiempo real guardando las coordenadas de cada pixel sobre el que se dibuja, y mediante un servidor VPS guarda automaticamente despues de 2 segundos la informacion de quien lo hizo (ej:Santiago hizo una linea en las coordenadas (x,y)).
 # TP4_Tablero_Compartido-Agostini-Poletto-Ogas
 -un programa que permite crear, modificar y eliminar. que permita gestionar tareas tipo Kanban, usando el backend FastAPI del VPS y persistencia en MySQL.
-
-
+# TP_%-Video-POO-Agostini-Santiago-LoginSinUsarQTDesigner
+- un video donde a mano se codifica un login en QT sin usar QT designer. 
