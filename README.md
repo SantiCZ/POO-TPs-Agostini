@@ -7,4 +7,4 @@
 # TP4_Tablero_Compartido-Agostini-Poletto-Ogas
 -un programa que permite crear, modificar y eliminar. que permita gestionar tareas tipo Kanban, usando el backend FastAPI del VPS y persistencia en MySQL.
 # TP_5-Video-POO-Agostini-Santiago-LoginSinUsarQTDesigner
-- un video donde a mano se codifica un login en QT sin usar QT designer. 
+- un video donde a mano se codifica un login en QT sin usar QT designer. enlace: https://youtu.be/KJjOkfCL2Kw
