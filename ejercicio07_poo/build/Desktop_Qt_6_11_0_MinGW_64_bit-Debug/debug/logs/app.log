@@ -1,0 +1,41 @@
+
+=== Sesión iniciada: 2026-04-22 20:11:02 ===
+[2026-04-22 20:11:02] [INFO] Aplicación iniciada
+[2026-04-22 20:11:02] [ERROR] ConfigManager: Archivo no encontrado: C:/Users/santi/Downloads/ejercicio07_poo/build/Desktop_Qt_6_11_0_MinGW_64_bit-Debug/debug/config/config.ini
+[2026-04-22 20:11:02] [ADVERTENCIA] Usando configuración por defecto (config.ini no encontrado)
+[2026-04-22 20:11:03] [INFO] Ventana: Inicializada
+[2026-04-22 20:11:03] [INFO] Clima: Inicializado, consulta cada 10 minutos
+[2026-04-22 20:11:03] [ADVERTENCIA] Clima: API key no configurada, usando datos offline
+[2026-04-22 20:11:03] [ADVERTENCIA] Clima: Usando datos simulados (modo offline)
+[2026-04-22 20:11:03] [INFO] Login: Pantalla inicializada
+[2026-04-22 20:11:03] [INFO] Main: Mostrando Login
+[2026-04-22 20:11:08] [INFO] Aplicación terminada con código: 0
+
+=== Sesión iniciada: 2026-04-22 20:33:53 ===
+[2026-04-22 20:33:53] [INFO] Aplicación iniciada
+[2026-04-22 20:33:53] [ERROR] ConfigManager: Archivo no encontrado: C:/Users/santi/Downloads/ejercicio07_poo/build/Desktop_Qt_6_11_0_MinGW_64_bit-Debug/debug/config/config.ini
+[2026-04-22 20:33:53] [ADVERTENCIA] Usando configuración por defecto (config.ini no encontrado)
+[2026-04-22 20:33:54] [INFO] Ventana: Inicializada
+[2026-04-22 20:33:54] [INFO] Clima: Inicializado, consulta cada 10 minutos
+[2026-04-22 20:33:54] [ADVERTENCIA] Clima: API key no configurada, usando datos offline
+[2026-04-22 20:33:54] [ADVERTENCIA] Clima: Usando datos simulados (modo offline)
+[2026-04-22 20:33:54] [INFO] Login: Pantalla inicializada
+[2026-04-22 20:33:54] [INFO] Main: Mostrando Login
+[2026-04-22 20:34:12] [INFO] Login: Autenticación exitosa para usuario: admin
+[2026-04-22 20:34:12] [INFO] Main: Login exitoso, iniciando descarga de imagen
+[2026-04-22 20:34:12] [ADVERTENCIA] Ventana: URL de imagen no configurada
+[2026-04-22 20:34:12] [INFO] Main: Imagen lista, mostrando ventana principal
+[2026-04-22 20:34:15] [INFO] Aplicación terminada con código: 0
+
+=== Sesión iniciada: 2026-04-22 20:34:55 ===
+[2026-04-22 20:34:55] [INFO] Aplicación iniciada
+[2026-04-22 20:34:55] [INFO] ConfigManager: Configuración cargada desde C:/Users/santi/Downloads/ejercicio07_poo/build/Desktop_Qt_6_11_0_MinGW_64_bit-Debug/debug/config/config.ini
+[2026-04-22 20:34:56] [INFO] Ventana: Inicializada
+[2026-04-22 20:34:56] [INFO] Clima: Inicializado, consulta cada 10 minutos
+[2026-04-22 20:34:56] [INFO] Clima: Consultando -> https://api.openweathermap.org/data/2.5/weather?q=Cordoba,AR&units=metric&lang=es&appid=d4125b7e913133af89cef5cb256fa57f
+[2026-04-22 20:34:56] [INFO] NetworkManager: GET -> https://api.openweathermap.org/data/2.5/weather?q=Cordoba,AR&units=metric&lang=es&appid=d4125b7e913133af89cef5cb256fa57f
+[2026-04-22 20:34:56] [INFO] Login: Pantalla inicializada
+[2026-04-22 20:34:56] [INFO] Main: Mostrando Login
+[2026-04-22 20:34:57] [INFO] Clima: Respuesta recibida (494 bytes)
+[2026-04-22 20:34:57] [INFO] Clima: 15.3°C, Nubes, humedad 85%
+[2026-04-22 20:35:09] [INFO] Aplicación terminada con código: 0

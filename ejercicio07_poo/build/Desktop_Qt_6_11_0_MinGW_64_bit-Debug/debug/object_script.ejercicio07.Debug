@@ -1,0 +1,13 @@
+debug/main.o
+debug/pantalla.o
+debug/login.o
+debug/ventana.o
+debug/clima.o
+debug/configmanager.o
+debug/logger.o
+debug/networkmanager.o
+debug/moc_pantalla.o
+debug/moc_login.o
+debug/moc_ventana.o
+debug/moc_clima.o
+debug/moc_networkmanager.o
