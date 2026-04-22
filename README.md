@@ -8,3 +8,5 @@
 -un programa que permite crear, modificar y eliminar. que permita gestionar tareas tipo Kanban, usando el backend FastAPI del VPS y persistencia en MySQL.
 # TP_5-Video-POO-Agostini-Santiago-LoginSinUsarQTDesigner
 - un video donde a mano se codifica un login en QT sin usar QT designer. enlace: https://youtu.be/KJjOkfCL2Kw
+# TP_7_Login_con_clima_y_fondo_de_pantalla
+-un login que usa una API de openweather para decir el clima. la pagina es una pagina con datos aleatorios que se pueden modificar segun se quiera
