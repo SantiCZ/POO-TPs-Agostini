@@ -12,3 +12,5 @@
 - un video donde se explica como hacer un login basico usando QTdesigner. enlace: https://youtu.be/y_BqJUA5bys
 # TP_7_Login_con_clima_y_fondo_de_pantalla
 -un login que usa una API de openweather para decir el clima. la pagina es una pagina con datos aleatorios que se pueden modificar segun se quiera
+# TP_8_editor_multilenguaje
+- un editor Editor principal con selector de lenguaje: C++, Python y Java.
