@@ -1,0 +1,17 @@
+debug/main.o
+debug/pantalla.o
+debug/login.o
+debug/editorprincipal.o
+debug/modobloqueado.o
+debug/validadorcpp.o
+debug/validadorpython.o
+debug/validadorjava.o
+debug/panelcurriculum.o
+debug/gestorlog.o
+debug/gestorconfig.o
+debug/exportadorjpg.o
+debug/moc_pantalla.o
+debug/moc_login.o
+debug/moc_editorprincipal.o
+debug/moc_modobloqueado.o
+debug/moc_panelcurriculum.o

@@ -1,0 +1,29 @@
+[2026-04-27 16:10:47] [main] Aplicación iniciada.
+[2026-04-27 16:10:48] [Login] Pantalla de Login inicializada.
+[2026-04-27 16:10:48] [Login] Pantalla activada y mostrada.
+[2026-04-27 16:10:48] [Login] resizeEvent en Login: 440x520
+[2026-04-27 16:10:48] [Login] resizeEvent: 440x520
+[2026-04-27 16:10:54] [Login] Login exitoso para usuario: admin
+[2026-04-27 16:10:54] [Login] closeEvent: cierre de la aplicación desde Login.
+[2026-04-27 16:10:59] [Login] keyPressEvent: tecla=16777220
+[2026-04-27 16:11:01] [Login] Login exitoso para usuario: admin
+[2026-04-27 16:11:01] [Login] closeEvent: cierre de la aplicación desde Login.
+[2026-04-27 16:11:02] [Login] Usuario confirmó cierre desde Login.
+[2026-04-27 16:11:02] [Login] Pantalla de Login destruida.
+[2026-04-27 16:11:02] [EditorPrincipal] resizeEvent en EditorPrincipal: 1536x864
+[2026-04-27 16:11:02] [EditorPrincipal] resizeEvent: 1536x864
+[2026-04-27 16:11:02] [EditorPrincipal] resizeEvent en EditorPrincipal: 1536x864
+[2026-04-27 16:11:02] [EditorPrincipal] resizeEvent: 1536x864
+[2026-04-27 16:11:02] [EditorPrincipal] EditorPrincipal inicializado.
+[2026-04-27 16:11:02] [EditorPrincipal] Pantalla activada y mostrada.
+[2026-04-27 16:11:04] [EditorPrincipal] mousePressEvent en editor: pos=(579,263) btn=1
+[2026-04-27 16:11:05] [EditorPrincipal] keyPressEvent en editor: key=32
+[2026-04-27 16:11:17] [EditorPrincipal] Errores de sintaxis limpiados.
+[2026-04-27 16:11:20] [EditorPrincipal] Exportación a JPG solicitada.
+[2026-04-27 16:11:22] [EditorPrincipal] Exportación exitosa: ./exportaciones/codigo_20260427_161120.jpg
+[2026-04-27 16:12:08] [EditorPrincipal] keyPressEvent en EditorPrincipal: key=16777251
+[2026-04-27 16:12:08] [EditorPrincipal] closeEvent: cierre del editor solicitado.
+[2026-04-27 16:12:11] [EditorPrincipal] Exportación a JPG solicitada.
+[2026-04-27 16:12:11] [EditorPrincipal] Exportación exitosa: ./exportaciones/codigo_20260427_161211.jpg
+[2026-04-27 16:12:13] [main] Aplicación cerrada correctamente.
+[2026-04-27 16:12:13] [EditorPrincipal] EditorPrincipal destruido.
