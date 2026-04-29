@@ -1,0 +1,10 @@
+debug/main.o
+debug/admindb.o
+debug/mainwindow.o
+debug/loginwindow.o
+debug/pintura.o
+debug/logger.o
+debug/moc_admindb.o
+debug/moc_mainwindow.o
+debug/moc_loginwindow.o
+debug/moc_pintura.o

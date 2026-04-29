@@ -1,0 +1,10 @@
+release/main.o
+release/admindb.o
+release/mainwindow.o
+release/loginwindow.o
+release/pintura.o
+release/logger.o
+release/moc_admindb.o
+release/moc_mainwindow.o
+release/moc_loginwindow.o
+release/moc_pintura.o
