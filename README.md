@@ -14,3 +14,5 @@
 - un login que usa una API de openweather para decir el clima. la pagina es una pagina con datos aleatorios que se pueden modificar segun se quiera
 # TP_8_editor_multilenguaje
 - un editor Editor principal con selector de lenguaje: C++, Python y Java.
+# TP_9-coordenadas_en_BD
+- un tablero de pintura al cual se le puede configurar colores usando letras, para mas detalles leer el readme del proyecto
