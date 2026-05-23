@@ -1,7 +1,7 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include <QMainWindow>
+#include <QWidget>
 #include <QLabel>
 #include <QLineEdit>
 #include <QSpinBox>
@@ -16,20 +16,19 @@
 #include "statusbadge.h"
 
 // ──────────────────────────────────────────────────────────
-//  MainWindow
-//  Ventana principal del panel de monitoreo VPS.
+//  MainWindow  (basado en QWidget, sin QMainWindow)
 //
 //  Widgets interactivos y su justificación:
-//  - QLineEdit     → ingresar URL del endpoint (input de texto libre)
-//  - QSpinBox      → intervalo de chequeo en segundos (valor entero acotado)
-//  - QDoubleSpinBox→ umbral de CPU/RAM para alertas (valor decimal fino)
-//  - QPushButton   → refresco manual, iniciar/detener monitoreo, limpiar log
-//  - QLabel        → mostrar último chequeo y uptime (lectura rápida)
-//  - StatusBadge   → indicador visual del estado general del servidor
+//  - QLineEdit      → ingresar URL del endpoint (texto libre)
+//  - QSpinBox       → intervalo de chequeo en segundos (entero acotado)
+//  - QDoubleSpinBox → umbral CPU/RAM para alertas (decimal fino)
+//  - QPushButton    → refresco manual, iniciar/detener, limpiar log
+//  - QLabel         → último chequeo, uptime, countdown (lectura rápida)
+//  - StatusBadge    → indicador visual del estado general
 //  - MetricCardWidget → tarjetas de métricas (CPU, RAM, Disco, Red)
 //  - EventLogWidget   → historial de eventos con scroll
 // ──────────────────────────────────────────────────────────
-class MainWindow : public QMainWindow
+class MainWindow : public QWidget
 {
     Q_OBJECT
 
@@ -60,6 +59,9 @@ private:
     void setupBottomPanel(QWidget *container);
     void applyDarkTheme();
 
+    // Barra de estado propia (reemplaza QStatusBar)
+    void setStatusMessage(const QString &msg);
+
     // ── Núcleo ──────────────────────────────
     ServerMonitor *m_monitor = nullptr;
 
@@ -77,6 +79,7 @@ private:
     QLabel         *m_lastCheckLabel  = nullptr;
     QLabel         *m_uptimeLabel     = nullptr;
     QLabel         *m_countdownLabel  = nullptr;
+    QLabel         *m_statusBarLabel  = nullptr;   // reemplaza QStatusBar
     QTimer         *m_countdownTimer  = nullptr;
     int             m_secondsToNext   = 0;
 

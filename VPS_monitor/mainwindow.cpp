@@ -3,20 +3,17 @@
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QGridLayout>
-#include <QGroupBox>
 #include <QSplitter>
-#include <QScrollArea>
 #include <QFrame>
 #include <QApplication>
 #include <QFont>
 #include <QSizePolicy>
-#include <QStatusBar>
 
 // ──────────────────────────────────────────────
 //  Constructor / Destructor
 // ──────────────────────────────────────────────
 MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent)
+    : QWidget(parent)          // ← QWidget, no QMainWindow
 {
     setWindowTitle(QStringLiteral("VPS Monitor"));
     setMinimumSize(920, 640);
@@ -49,96 +46,118 @@ MainWindow::~MainWindow() {}
 
 // ──────────────────────────────────────────────
 //  Construcción del UI
+//  Con QWidget el layout va directo sobre 'this',
+//  no hay setCentralWidget() ni statusBar().
 // ──────────────────────────────────────────────
 void MainWindow::setupUi()
 {
-    auto *central   = new QWidget(this);
-    auto *mainVBox  = new QVBoxLayout(central);
+    auto *mainVBox = new QVBoxLayout(this);   // layout directo sobre QWidget
     mainVBox->setContentsMargins(0, 0, 0, 0);
     mainVBox->setSpacing(0);
-    setCentralWidget(central);
 
     // ── Top bar ──────────────────────────────
-    auto *topBar = new QWidget(central);
+    auto *topBar = new QWidget(this);
     topBar->setFixedHeight(58);
     topBar->setObjectName(QStringLiteral("topBar"));
     setupTopBar(topBar);
     mainVBox->addWidget(topBar);
 
     // ── Config panel ─────────────────────────
-    auto *cfgPanel = new QWidget(central);
+    auto *cfgPanel = new QWidget(this);
     cfgPanel->setObjectName(QStringLiteral("configPanel"));
     cfgPanel->setFixedHeight(56);
     setupConfigPanel(cfgPanel);
     mainVBox->addWidget(cfgPanel);
 
     // ── Separador ────────────────────────────
-    auto *sep = new QFrame(central);
+    auto *sep = new QFrame(this);
     sep->setFrameShape(QFrame::HLine);
-    sep->setStyleSheet(QStringLiteral("background:#1E1E2E; border:none; min-height:1px; max-height:1px;"));
+    sep->setStyleSheet(QStringLiteral(
+        "background:#1E1E2E; border:none; min-height:1px; max-height:1px;"));
     mainVBox->addWidget(sep);
 
     // ── Área de contenido (métricas + log) ───
-    auto *contentWidget = new QWidget(central);
+    auto *contentWidget = new QWidget(this);
     auto *contentHBox   = new QHBoxLayout(contentWidget);
-    contentHBox->setContentsMargins(12, 12, 12, 12);
+    contentHBox->setContentsMargins(12, 12, 12, 8);
     contentHBox->setSpacing(12);
 
-    // Panel izquierdo: métricas
     auto *metricsPanel = new QWidget(contentWidget);
     setupMetricsGrid(metricsPanel);
 
-    // Panel derecho: log de eventos
     auto *logPanel = new QWidget(contentWidget);
     setupBottomPanel(logPanel);
 
-    // Splitter para redimensionar
     auto *splitter = new QSplitter(Qt::Horizontal, contentWidget);
     splitter->setChildrenCollapsible(false);
     splitter->addWidget(metricsPanel);
     splitter->addWidget(logPanel);
     splitter->setStretchFactor(0, 3);
     splitter->setStretchFactor(1, 2);
-    splitter->setStyleSheet(QStringLiteral("QSplitter::handle { background: #1E1E2E; width: 2px; }"));
+    splitter->setStyleSheet(QStringLiteral(
+        "QSplitter::handle { background: #1E1E2E; width: 2px; }"));
 
     contentHBox->addWidget(splitter);
     mainVBox->addWidget(contentWidget, 1);
 
-    // Status bar
-    statusBar()->setStyleSheet(QStringLiteral("background:#0E0E18; color:#555566; font-size:11px;"));
-    statusBar()->showMessage(QStringLiteral("Listo. Configure el endpoint y presione Iniciar."));
+    // ── Barra de estado propia ────────────────
+    // QMainWindow tiene statusBar() integrado; en QWidget la creamos
+    // manualmente como un QLabel fijo al fondo.
+    auto *statusBarWidget = new QWidget(this);
+    statusBarWidget->setFixedHeight(22);
+    statusBarWidget->setObjectName(QStringLiteral("statusBar"));
+    statusBarWidget->setStyleSheet(QStringLiteral(
+        "#statusBar { background:#0A0A14; border-top:1px solid #1A1A28; }"));
+
+    auto *sbLayout = new QHBoxLayout(statusBarWidget);
+    sbLayout->setContentsMargins(10, 0, 10, 0);
+
+    m_statusBarLabel = new QLabel(
+        QStringLiteral("Listo. Configure el endpoint y presione Iniciar."),
+        statusBarWidget);
+    m_statusBarLabel->setStyleSheet(QStringLiteral(
+        "color:#444455; font-size:11px; background:transparent;"));
+
+    sbLayout->addWidget(m_statusBarLabel);
+    mainVBox->addWidget(statusBarWidget);
 }
 
+// ──────────────────────────────────────────────
+//  Barra de estado manual
+// ──────────────────────────────────────────────
+void MainWindow::setStatusMessage(const QString &msg)
+{
+    if (m_statusBarLabel)
+        m_statusBarLabel->setText(msg);
+}
+
+// ──────────────────────────────────────────────
 void MainWindow::setupTopBar(QWidget *container)
 {
     auto *hbox = new QHBoxLayout(container);
     hbox->setContentsMargins(16, 0, 16, 0);
     hbox->setSpacing(16);
 
-    // Logotipo / título
     auto *titleLabel = new QLabel(QStringLiteral("⬡  VPS MONITOR"), container);
     titleLabel->setStyleSheet(QStringLiteral(
         "color:#7EC8E3; font-size:16px; font-weight:700; letter-spacing:2px;"));
 
-    // Badge de estado
     m_statusBadge = new StatusBadge(container);
     m_statusBadge->setStatus(QStringLiteral("unknown"));
     m_statusBadge->setFixedWidth(110);
 
-    // Uptime
     auto *uptimeLbl = new QLabel(QStringLiteral("Uptime:"), container);
     uptimeLbl->setStyleSheet(QStringLiteral("color:#555566; font-size:11px;"));
-    m_uptimeLabel   = new QLabel(QStringLiteral("—"), container);
-    m_uptimeLabel->setStyleSheet(QStringLiteral("color:#AAAACC; font-size:11px; font-weight:600;"));
+    m_uptimeLabel = new QLabel(QStringLiteral("—"), container);
+    m_uptimeLabel->setStyleSheet(QStringLiteral(
+        "color:#AAAACC; font-size:11px; font-weight:600;"));
 
-    // Último chequeo
     auto *lastChkLbl = new QLabel(QStringLiteral("Último chequeo:"), container);
     lastChkLbl->setStyleSheet(QStringLiteral("color:#555566; font-size:11px;"));
     m_lastCheckLabel = new QLabel(QStringLiteral("—"), container);
     m_lastCheckLabel->setStyleSheet(QStringLiteral("color:#AAAACC; font-size:11px;"));
 
-    // Countdown
-    m_countdownLabel = new QLabel(QStringLiteral(""), container);
+    m_countdownLabel = new QLabel(QString(), container);
     m_countdownLabel->setStyleSheet(QStringLiteral("color:#444455; font-size:11px;"));
 
     hbox->addWidget(titleLabel);
@@ -160,8 +179,7 @@ void MainWindow::setupConfigPanel(QWidget *container)
     hbox->setContentsMargins(16, 6, 16, 6);
     hbox->setSpacing(10);
 
-    // URL del endpoint
-    // QLineEdit: widget de texto libre, necesario porque la URL es variable
+    // QLineEdit: texto libre para la URL del endpoint
     auto *urlLbl = new QLabel(QStringLiteral("Endpoint URL:"), container);
     urlLbl->setStyleSheet(QStringLiteral("color:#666677; font-size:11px;"));
 
@@ -174,8 +192,7 @@ void MainWindow::setupConfigPanel(QWidget *container)
         "            color:#DDDDEE; padding:4px 8px; font-size:12px; }"
         "QLineEdit:focus { border-color:#5577AA; }"));
 
-    // Intervalo de chequeo
-    // QSpinBox: valor entero acotado entre 5 y 3600 segundos. Ideal para este campo.
+    // QSpinBox: valor entero acotado (5–3600 s)
     auto *intLbl = new QLabel(QStringLiteral("Intervalo (s):"), container);
     intLbl->setStyleSheet(QStringLiteral("color:#666677; font-size:11px;"));
 
@@ -190,8 +207,7 @@ void MainWindow::setupConfigPanel(QWidget *container)
         "QSpinBox:focus { border-color:#5577AA; }"
         "QSpinBox::up-button, QSpinBox::down-button { background:#22223A; border:none; }"));
 
-    // Umbral CPU
-    // QDoubleSpinBox: permite decimales para afinar el umbral de alerta
+    // QDoubleSpinBox: umbral CPU con decimales
     auto *cpuThrLbl = new QLabel(QStringLiteral("Umbral CPU%:"), container);
     cpuThrLbl->setStyleSheet(QStringLiteral("color:#666677; font-size:11px;"));
 
@@ -203,7 +219,7 @@ void MainWindow::setupConfigPanel(QWidget *container)
     m_threshCpuSpin->setFixedWidth(85);
     m_threshCpuSpin->setStyleSheet(m_intervalSpin->styleSheet());
 
-    // Umbral RAM
+    // QDoubleSpinBox: umbral RAM con decimales
     auto *memThrLbl = new QLabel(QStringLiteral("Umbral RAM%:"), container);
     memThrLbl->setStyleSheet(QStringLiteral("color:#666677; font-size:11px;"));
 
@@ -215,8 +231,7 @@ void MainWindow::setupConfigPanel(QWidget *container)
     m_threshMemSpin->setFixedWidth(85);
     m_threshMemSpin->setStyleSheet(m_intervalSpin->styleSheet());
 
-    // Botón Iniciar/Detener
-    // QPushButton: acción principal de control del monitoreo
+    // QPushButton: acción principal iniciar/detener
     m_startStopBtn = new QPushButton(QStringLiteral("▶  Iniciar"), container);
     m_startStopBtn->setFixedWidth(100);
     m_startStopBtn->setStyleSheet(QStringLiteral(
@@ -225,8 +240,7 @@ void MainWindow::setupConfigPanel(QWidget *container)
         "QPushButton:hover { background:#2A5040; }"
         "QPushButton:pressed { background:#183428; }"));
 
-    // Botón Refresco manual
-    // QPushButton: permite al usuario forzar un chequeo inmediato sin esperar el intervalo
+    // QPushButton: refresco manual sin esperar el intervalo
     m_refreshBtn = new QPushButton(QStringLiteral("⟳  Ahora"), container);
     m_refreshBtn->setFixedWidth(85);
     m_refreshBtn->setEnabled(false);
@@ -251,7 +265,6 @@ void MainWindow::setupConfigPanel(QWidget *container)
     hbox->addWidget(m_refreshBtn);
     hbox->addWidget(m_startStopBtn);
 
-    // ── Conexiones ────────────────────────────
     connect(m_startStopBtn, &QPushButton::clicked, this, &MainWindow::onStartStopClicked);
     connect(m_refreshBtn,   &QPushButton::clicked, this, &MainWindow::onRefreshClicked);
     connect(m_intervalSpin,  QOverload<int>::of(&QSpinBox::valueChanged),
@@ -268,49 +281,37 @@ void MainWindow::setupMetricsGrid(QWidget *container)
     vbox->setContentsMargins(0, 0, 0, 0);
     vbox->setSpacing(10);
 
-    // Título de sección
     auto *secLabel = new QLabel(QStringLiteral("MÉTRICAS DEL SERVIDOR"), container);
     secLabel->setStyleSheet(QStringLiteral(
         "color:#444455; font-size:10px; letter-spacing:2px; font-weight:700;"));
 
-    // Grid 2×3 de tarjetas
     auto *grid = new QGridLayout();
     grid->setSpacing(10);
 
-    // CPU – anillo, acento azul-cian
     m_cardCpu = new MetricCardWidget(QStringLiteral("CPU"),
                                      QStringLiteral("%"),
-                                     MetricCardWidget::Style::Ring,
-                                     container);
+                                     MetricCardWidget::Style::Ring, container);
     m_cardCpu->setAccentColor(QColor(0x43, 0xB3, 0xD8));
 
-    // RAM – anillo, acento verde
     m_cardMem = new MetricCardWidget(QStringLiteral("RAM"),
                                      QStringLiteral("%"),
-                                     MetricCardWidget::Style::Ring,
-                                     container);
+                                     MetricCardWidget::Style::Ring, container);
     m_cardMem->setAccentColor(QColor(0x43, 0xC6, 0x80));
 
-    // Disco – barra, acento naranja
     m_cardDisk = new MetricCardWidget(QStringLiteral("Disco"),
                                       QStringLiteral("%"),
-                                      MetricCardWidget::Style::Bar,
-                                      container);
+                                      MetricCardWidget::Style::Bar, container);
     m_cardDisk->setAccentColor(QColor(0xF0, 0xA0, 0x30));
 
-    // Red RX – barra
     m_cardRx = new MetricCardWidget(QStringLiteral("Red ↓ RX"),
                                     QStringLiteral("KB/s"),
-                                    MetricCardWidget::Style::Bar,
-                                    container);
+                                    MetricCardWidget::Style::Bar, container);
     m_cardRx->setAccentColor(QColor(0x88, 0xBB, 0xFF));
-    m_cardRx->setMaxValue(10240.0);   // 10 MB/s como máx visual
+    m_cardRx->setMaxValue(10240.0);
 
-    // Red TX – barra
     m_cardTx = new MetricCardWidget(QStringLiteral("Red ↑ TX"),
                                     QStringLiteral("KB/s"),
-                                    MetricCardWidget::Style::Bar,
-                                    container);
+                                    MetricCardWidget::Style::Bar, container);
     m_cardTx->setAccentColor(QColor(0xDD, 0x88, 0xFF));
     m_cardTx->setMaxValue(10240.0);
 
@@ -320,7 +321,6 @@ void MainWindow::setupMetricsGrid(QWidget *container)
     grid->addWidget(m_cardRx,   1, 0);
     grid->addWidget(m_cardTx,   1, 1);
 
-    // Placeholder para celda vacía (futuras métricas)
     auto *placeholder = new QWidget(container);
     placeholder->setStyleSheet(QStringLiteral(
         "background:#131320; border:1px dashed #1E1E2E; border-radius:10px;"));
@@ -336,13 +336,12 @@ void MainWindow::setupBottomPanel(QWidget *container)
     vbox->setContentsMargins(0, 0, 0, 0);
     vbox->setSpacing(8);
 
-    // Cabecera del log
-    auto *hdr   = new QHBoxLayout();
+    auto *hdr    = new QHBoxLayout();
     auto *lblLog = new QLabel(QStringLiteral("HISTORIAL DE EVENTOS"), container);
     lblLog->setStyleSheet(QStringLiteral(
         "color:#444455; font-size:10px; letter-spacing:2px; font-weight:700;"));
 
-    // QPushButton: limpiar log, justificado porque el log puede acumular muchas entradas
+    // QPushButton: limpiar log acumulado
     m_clearLogBtn = new QPushButton(QStringLiteral("Limpiar"), container);
     m_clearLogBtn->setFixedWidth(68);
     m_clearLogBtn->setStyleSheet(QStringLiteral(
@@ -354,7 +353,6 @@ void MainWindow::setupBottomPanel(QWidget *container)
     hdr->addStretch(1);
     hdr->addWidget(m_clearLogBtn);
 
-    // Widget de log
     m_eventLog = new EventLogWidget(container);
 
     vbox->addLayout(hdr);
@@ -378,11 +376,11 @@ void MainWindow::onStartStopClicked()
             "              border-radius:5px; padding:5px 10px; font-size:12px; font-weight:600; }"
             "QPushButton:hover { background:#2A5040; }"));
         m_refreshBtn->setEnabled(false);
-        statusBar()->showMessage(QStringLiteral("Monitoreo detenido."));
+        setStatusMessage(QStringLiteral("Monitoreo detenido."));
     } else {
         const QString url = m_urlEdit->text().trimmed();
         if (url.isEmpty()) {
-            statusBar()->showMessage(QStringLiteral("⚠ Ingrese una URL de endpoint válida."));
+            setStatusMessage(QStringLiteral("⚠ Ingrese una URL de endpoint válida."));
             return;
         }
         m_monitor->setEndpointUrl(url);
@@ -400,7 +398,7 @@ void MainWindow::onStartStopClicked()
             "              border-radius:5px; padding:5px 10px; font-size:12px; font-weight:600; }"
             "QPushButton:hover { background:#4A1828; }"));
         m_refreshBtn->setEnabled(true);
-        statusBar()->showMessage(QStringLiteral("Monitoreo activo → ") + url);
+        setStatusMessage(QStringLiteral("Monitoreo activo → ") + url);
     }
 }
 
@@ -408,7 +406,7 @@ void MainWindow::onRefreshClicked()
 {
     m_monitor->checkNow();
     m_secondsToNext = m_intervalSpin->value();
-    statusBar()->showMessage(QStringLiteral("Chequeo manual solicitado…"));
+    setStatusMessage(QStringLiteral("Chequeo manual solicitado…"));
 }
 
 void MainWindow::onClearLogClicked()
@@ -435,11 +433,11 @@ void MainWindow::onThresholdMemChanged(double pct)
 
 void MainWindow::updateCountdownLabel()
 {
-    if (m_secondsToNext <= 0) {
+    if (m_secondsToNext <= 0)
         m_secondsToNext = m_intervalSpin->value();
-    } else {
+    else
         m_secondsToNext--;
-    }
+
     m_countdownLabel->setText(
         QStringLiteral("Próximo en %1s").arg(m_secondsToNext));
 }
@@ -466,11 +464,11 @@ void MainWindow::onMetricsUpdated(const ServerMetrics &m)
 
     m_secondsToNext = m_intervalSpin->value();
 
-    statusBar()->showMessage(
+    setStatusMessage(
         QStringLiteral("CPU: %1%  |  RAM: %2%  |  Disco: %3%  |  RX: %4 KB/s  |  TX: %5 KB/s")
-            .arg(m.cpuLoad,    0, 'f', 1)
-            .arg(m.memUsedPct, 0, 'f', 1)
-            .arg(m.diskUsedPct,0, 'f', 1)
+            .arg(m.cpuLoad,       0, 'f', 1)
+            .arg(m.memUsedPct,    0, 'f', 1)
+            .arg(m.diskUsedPct,   0, 'f', 1)
             .arg(m.networkRxKbps, 0, 'f', 1)
             .arg(m.networkTxKbps, 0, 'f', 1));
 }
@@ -478,10 +476,10 @@ void MainWindow::onMetricsUpdated(const ServerMetrics &m)
 void MainWindow::onConnectionError(const QString &err)
 {
     m_statusBadge->setStatus(QStringLiteral("down"));
-    statusBar()->showMessage(QStringLiteral("❌ Error: ") + err);
+    setStatusMessage(QStringLiteral("❌ Error: ") + err);
 }
 
-void MainWindow::onStatusChanged(const QString &newStatus, const QString &/*oldStatus*/)
+void MainWindow::onStatusChanged(const QString &newStatus, const QString &)
 {
     m_statusBadge->setStatus(newStatus);
 }
@@ -497,23 +495,10 @@ void MainWindow::onNewEventLogged(const EventEntry &e)
 void MainWindow::applyDarkTheme()
 {
     setStyleSheet(QStringLiteral(R"(
-        QMainWindow, QWidget {
+        QWidget {
             background-color: #0E0E18;
             color: #CCCCDD;
             font-family: "Segoe UI", "Noto Sans", sans-serif;
-        }
-        QGroupBox {
-            border: 1px solid #1E1E2E;
-            border-radius: 8px;
-            margin-top: 6px;
-            padding-top: 10px;
-            color: #555566;
-            font-size: 10px;
-            letter-spacing: 1px;
-        }
-        QGroupBox::title {
-            subcontrol-origin: margin;
-            left: 10px;
         }
         QSplitter {
             background: transparent;
@@ -532,11 +517,6 @@ void MainWindow::applyDarkTheme()
         #configPanel {
             background: #0C0C1A;
             border-bottom: 1px solid #1A1A28;
-        }
-        QStatusBar {
-            background: #0A0A14;
-            color: #444455;
-            font-size: 11px;
         }
     )"));
 }
