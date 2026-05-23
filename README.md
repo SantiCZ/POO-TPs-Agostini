@@ -21,7 +21,7 @@
 # [TP_7_Login_con_clima_y_fondo_de_pantalla](./ejercicio07_poo)
 - Un login que usa una API de OpenWeather para mostrar el clima. La página contiene datos aleatorios modificables.
 
-# [TP_8_editor_multilenguaje](./editor_multilenguaje)
+# [TP_8_editor_multilenguaje](./TP-10-T-rex)
 - Editor principal con selector de lenguaje: C++, Python y Java.
 
 # [TP_9-coordenadas_en_BD](./coordenadas_en_BD)
