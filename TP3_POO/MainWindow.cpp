@@ -1,16 +1,14 @@
 #include "MainWindow.h"
-#include <QToolBar>
 #include <QKeyEvent>
-#include <QVBoxLayout>
-#include <QHBoxLayout>
 #include <QLabel>
 #include <QPushButton>
-#include <QStatusBar>
+#include <QHBoxLayout>
+#include <QVBoxLayout>
+#include <QFrame>
 #include <QMessageBox>
 #include <QInputDialog>
-#include <QIcon>
-#include <QFrame>
 #include <QSettings>
+#include <QLineEdit>
 
 // ── Color palette helper ──────────────────────────────────────────────────────
 
@@ -25,7 +23,7 @@ QColor MainWindow::colorForIndex(int idx) const {
 // ── Constructor ───────────────────────────────────────────────────────────────
 
 MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent)
+    : QWidget(parent)
 {
     setWindowTitle("Collaborative Canvas");
     resize(1200, 800);
@@ -34,40 +32,39 @@ MainWindow::MainWindow(QWidget *parent)
     m_canvas = new CanvasView(m_model, this);
     m_sync   = new SyncManager(m_model, this);
 
-    // Load server URL from settings (or prompt user)
+    // Cargar y limpiar URL del servidor
     QSettings settings("CollabCanvas", "CollabCanvas");
-    // Siempre preguntar la URL para evitar URLs corruptas cacheadas
-    QString savedUrl = settings.value("serverUrl", "http://161.97.92.143:5005").toString();
-    // Limpiar URLs que tengan rutas incorrectas (solo conservar host:puerto)
+    QString savedUrl = settings.value("serverUrl", "http://161.97.92.143:3001").toString();
     QUrl parsedUrl(savedUrl);
-    QString serverUrl = parsedUrl.scheme() + "://" + parsedUrl.host() + ":" + QString::number(parsedUrl.port(5005));
+    QString serverUrl = parsedUrl.scheme() + "://" + parsedUrl.host()
+                        + ":" + QString::number(parsedUrl.port(3001));
 
     bool ok;
     serverUrl = QInputDialog::getText(
         this, "Server URL",
-        "Enter VPS server URL (e.g. http://161.97.92.143:5005):",
+        "Ingresá la URL del servidor VPS (ej: http://161.97.92.143:3001):",
         QLineEdit::Normal, serverUrl, &ok);
     if (ok && !serverUrl.isEmpty()) {
-        // Asegurarse de que no tenga barra al final ni rutas extra
         while (serverUrl.endsWith('/')) serverUrl.chop(1);
         settings.setValue("serverUrl", serverUrl);
     }
     m_sync->setServerUrl(serverUrl);
 
-    setupToolbar();
+    // Layout principal: toolbar arriba, canvas en el medio, statusbar abajo
+    QVBoxLayout *mainLayout = new QVBoxLayout(this);
+    mainLayout->setContentsMargins(0, 0, 0, 0);
+    mainLayout->setSpacing(0);
+
+    mainLayout->addWidget(buildToolbar());
+    mainLayout->addWidget(m_canvas, 1);   // 1 = ocupa todo el espacio restante
+    mainLayout->addWidget(buildStatusBar());
+
     applyMetroStyle();
-
-    setCentralWidget(m_canvas);
-
-    // Status bar
-    m_statusLabel = new QLabel("Ready");
-    statusBar()->addWidget(m_statusLabel);
 
     // Connections
     connect(m_canvas, &CanvasView::thicknessChanged,
             this, &MainWindow::onThicknessChanged);
     connect(m_canvas, &CanvasView::strokeFinished, this, [this]() {
-        // Auto-guardar al servidor cada vez que se termina un trazo
         m_sync->saveToServer();
     });
     connect(m_sync, &SyncManager::statusMessage, this, [this](const QString &msg) {
@@ -76,14 +73,14 @@ MainWindow::MainWindow(QWidget *parent)
     connect(m_sync, &SyncManager::saveSuccess,  this, &MainWindow::onSaveSuccess);
     connect(m_sync, &SyncManager::saveError,    this, &MainWindow::onSaveError);
     connect(m_sync, &SyncManager::fetchSuccess, this, [this]() {
-        m_statusLabel->setText("Synced with server.");
+        m_statusLabel->setText("✓ Sincronizado");
     });
 
-    // Initial fetch + start polling
+    // Fetch inicial + polling
     m_sync->fetchFromServer();
-    m_sync->startPolling(2000);   // poll every 2 seconds para mayor inmediatez colaborativa
+    m_sync->startPolling(5000);
 
-    // Set initial color
+    // Color inicial
     m_canvas->setColor(colorForIndex(0));
     updateColorSwatch();
 }
@@ -92,66 +89,73 @@ MainWindow::~MainWindow() {}
 
 // ── Toolbar ───────────────────────────────────────────────────────────────────
 
-void MainWindow::setupToolbar() {
-    QToolBar *bar = addToolBar("Main");
-    bar->setMovable(false);
-    bar->setFloatable(false);
-    bar->setIconSize(QSize(24, 24));
-    bar->setObjectName("mainToolbar");
+QWidget* MainWindow::buildToolbar() {
+    QWidget *bar = new QWidget();
+    bar->setObjectName("toolbar");
+    bar->setFixedHeight(48);
 
-    // Save button (Metro style)
+    QHBoxLayout *layout = new QHBoxLayout(bar);
+    layout->setContentsMargins(8, 4, 8, 4);
+    layout->setSpacing(8);
+
+    // Botón Guardar (estilo Metro)
     m_saveButton = new QPushButton("  💾  GUARDAR");
     m_saveButton->setObjectName("metroSaveButton");
     m_saveButton->setFixedHeight(36);
     m_saveButton->setMinimumWidth(140);
     connect(m_saveButton, &QPushButton::clicked, this, &MainWindow::onSaveClicked);
-    bar->addWidget(m_saveButton);
+    layout->addWidget(m_saveButton);
 
-    bar->addSeparator();
+    // Separador
+    auto sep = [&]() {
+        QFrame *f = new QFrame();
+        f->setFrameShape(QFrame::VLine);
+        f->setObjectName("separator");
+        f->setFixedWidth(1);
+        layout->addWidget(f);
+    };
+
+    sep();
 
     // Color swatch
     QLabel *colorLabel = new QLabel("Color:");
     colorLabel->setObjectName("toolLabel");
-    bar->addWidget(colorLabel);
+    layout->addWidget(colorLabel);
 
     m_colorSwatch = new QLabel();
     m_colorSwatch->setFixedSize(28, 28);
     m_colorSwatch->setObjectName("colorSwatch");
-    bar->addWidget(m_colorSwatch);
+    layout->addWidget(m_colorSwatch);
 
-    QLabel *keysHint = new QLabel("  Keys 1–9");
+    QLabel *keysHint = new QLabel("Teclas 1–9");
     keysHint->setObjectName("hintLabel");
-    bar->addWidget(keysHint);
+    layout->addWidget(keysHint);
 
-    bar->addSeparator();
+    sep();
 
-    // Thickness indicator
-    QLabel *thickLabel = new QLabel("Thickness:");
+    // Grosor
+    QLabel *thickLabel = new QLabel("Grosor:");
     thickLabel->setObjectName("toolLabel");
-    bar->addWidget(thickLabel);
+    layout->addWidget(thickLabel);
 
     m_thicknessLabel = new QLabel("6 px");
     m_thicknessLabel->setObjectName("thicknessLabel");
     m_thicknessLabel->setMinimumWidth(50);
-    bar->addWidget(m_thicknessLabel);
+    layout->addWidget(m_thicknessLabel);
 
-    QLabel *scrollHint = new QLabel("  (scroll wheel)");
+    QLabel *scrollHint = new QLabel("(scroll)");
     scrollHint->setObjectName("hintLabel");
-    bar->addWidget(scrollHint);
+    layout->addWidget(scrollHint);
 
-    bar->addSeparator();
+    sep();
 
-    // Palette swatches (visual reference)
-    QLabel *paletteLabel = new QLabel("Palette:");
+    // Paleta de colores
+    QLabel *paletteLabel = new QLabel("Paleta:");
     paletteLabel->setObjectName("toolLabel");
-    bar->addWidget(paletteLabel);
+    layout->addWidget(paletteLabel);
 
-    QWidget *palette = new QWidget();
-    QHBoxLayout *pLayout = new QHBoxLayout(palette);
-    pLayout->setContentsMargins(4, 2, 4, 2);
-    pLayout->setSpacing(3);
     for (int i = 0; i < 9; ++i) {
-        QLabel *swatch = new QLabel(QString::number(i+1));
+        QLabel *swatch = new QLabel(QString::number(i + 1));
         swatch->setFixedSize(22, 22);
         swatch->setAlignment(Qt::AlignCenter);
         QColor c = colorForIndex(i);
@@ -159,39 +163,60 @@ void MainWindow::setupToolbar() {
                                   "background:%1; color:%2; font-size:10px; font-weight:bold; border:1px solid #555;")
                                   .arg(c.name())
                                   .arg(c.lightness() > 128 ? "#000" : "#fff"));
-        pLayout->addWidget(swatch);
+        layout->addWidget(swatch);
     }
-    bar->addWidget(palette);
 
-    bar->addSeparator();
+    sep();
 
-    // Hints
-    QLabel *hint = new QLabel("LMB: Draw  |  RMB: Erase");
+    QLabel *hint = new QLabel("Click izq: Dibujar  |  Click der: Borrar");
     hint->setObjectName("hintLabel");
-    bar->addWidget(hint);
+    layout->addWidget(hint);
+
+    layout->addStretch();   // empuja todo a la izquierda
+
+    return bar;
 }
 
-void MainWindow::updateColorSwatch() {
-    QColor c = colorForIndex(m_colorIndex);
-    m_colorSwatch->setStyleSheet(QString(
-                                     "background:%1; border:2px solid %2; border-radius:3px;")
-                                     .arg(c.name())
-                                     .arg(c.darker(150).name()));
+// ── Status bar ────────────────────────────────────────────────────────────────
+
+QWidget* MainWindow::buildStatusBar() {
+    QWidget *bar = new QWidget();
+    bar->setObjectName("statusBar");
+    bar->setFixedHeight(24);
+
+    QHBoxLayout *layout = new QHBoxLayout(bar);
+    layout->setContentsMargins(8, 0, 8, 0);
+
+    m_statusLabel = new QLabel("Listo");
+    m_statusLabel->setObjectName("statusLabel");
+    layout->addWidget(m_statusLabel);
+    layout->addStretch();
+
+    return bar;
 }
 
 // ── Styling ───────────────────────────────────────────────────────────────────
 
 void MainWindow::applyMetroStyle() {
     setStyleSheet(R"(
-        QMainWindow {
+        QWidget {
             background: #1a1a2e;
+            color: #ffffff;
         }
 
-        QToolBar#mainToolbar {
+        QWidget#toolbar {
             background: #16213e;
             border-bottom: 2px solid #0f3460;
-            padding: 4px 8px;
-            spacing: 6px;
+        }
+
+        QWidget#statusBar {
+            background: #16213e;
+            border-top: 1px solid #0f3460;
+        }
+
+        QFrame#separator {
+            background: #0f3460;
+            margin: 6px 2px;
         }
 
         QPushButton#metroSaveButton {
@@ -212,57 +237,62 @@ void MainWindow::applyMetroStyle() {
             background: #960f3a;
         }
         QPushButton#metroSaveButton:disabled {
-            background: #555;
-            color: #999;
+            background: #555555;
+            color: #999999;
         }
 
         QLabel#toolLabel {
             color: #8899bb;
             font-size: 11px;
             font-family: 'Segoe UI', sans-serif;
-            padding: 0 4px;
+            padding: 0 2px;
+            background: transparent;
         }
         QLabel#hintLabel {
             color: #556688;
             font-size: 10px;
             font-family: 'Segoe UI', sans-serif;
-            padding: 0 4px;
+            padding: 0 2px;
+            background: transparent;
         }
         QLabel#thicknessLabel {
             color: #18e9c7;
             font-size: 12px;
             font-weight: bold;
             font-family: 'Consolas', 'Courier New', monospace;
+            background: transparent;
         }
-
-        QToolBar QSeparator, QToolBar::separator {
-            background: #0f3460;
-            width: 1px;
-            margin: 4px 6px;
-        }
-
-        QStatusBar {
-            background: #16213e;
+        QLabel#statusLabel {
             color: #8899bb;
             font-size: 11px;
             font-family: 'Segoe UI', sans-serif;
-            border-top: 1px solid #0f3460;
+            background: transparent;
         }
     )");
 }
 
-// ── Key events (color selection) ──────────────────────────────────────────────
+// ── Color swatch ──────────────────────────────────────────────────────────────
+
+void MainWindow::updateColorSwatch() {
+    QColor c = colorForIndex(m_colorIndex);
+    m_colorSwatch->setStyleSheet(QString(
+                                     "background:%1; border:2px solid %2; border-radius:3px;")
+                                     .arg(c.name())
+                                     .arg(c.darker(150).name()));
+}
+
+// ── Key events ────────────────────────────────────────────────────────────────
 
 void MainWindow::keyPressEvent(QKeyEvent *event) {
     int key = event->key();
     if (key >= Qt::Key_1 && key <= Qt::Key_9) {
-        m_colorIndex = key - Qt::Key_1;   // 0..8
+        m_colorIndex = key - Qt::Key_1;
         QColor c = colorForIndex(m_colorIndex);
         m_canvas->setColor(c);
         updateColorSwatch();
-        m_statusLabel->setText(QString("Color %1: %2").arg(m_colorIndex+1).arg(c.name()));
+        m_statusLabel->setText(QString("Color %1: %2").arg(m_colorIndex + 1).arg(c.name()));
     }
-    QMainWindow::keyPressEvent(event);
+    QWidget::keyPressEvent(event);
 }
 
 // ── Slots ─────────────────────────────────────────────────────────────────────
@@ -278,7 +308,6 @@ void MainWindow::onThicknessChanged(int t) {
 }
 
 void MainWindow::onSaveSuccess() {
-    // Solo restaurar el botón si fue deshabilitado (guardado manual)
     if (!m_saveButton->isEnabled()) {
         m_saveButton->setEnabled(true);
         m_saveButton->setText("  💾  GUARDAR");
@@ -287,13 +316,11 @@ void MainWindow::onSaveSuccess() {
 }
 
 void MainWindow::onSaveError(const QString &msg) {
-    // Solo mostrar diálogo de error en guardado manual (botón deshabilitado)
     if (!m_saveButton->isEnabled()) {
         m_saveButton->setEnabled(true);
         m_saveButton->setText("  💾  GUARDAR");
-        QMessageBox::warning(this, "Save Error", msg);
+        QMessageBox::warning(this, "Error al guardar", msg);
     } else {
-        // Auto-guardado silencioso: solo mostrar en barra de estado
         m_statusLabel->setText("⚠ Error al sincronizar: " + msg);
     }
 }

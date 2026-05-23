@@ -1,15 +1,15 @@
 #pragma once
 
-#include <QMainWindow>
+#include <QWidget>
 #include <QLabel>
 #include <QPushButton>
-#include <QToolBar>
-#include <QStatusBar>
+#include <QHBoxLayout>
+#include <QVBoxLayout>
 #include "DrawingModel.h"
 #include "CanvasView.h"
 #include "SyncManager.h"
 
-class MainWindow : public QMainWindow {
+class MainWindow : public QWidget {
     Q_OBJECT
 
 public:
@@ -35,10 +35,11 @@ private:
     QLabel       *m_statusLabel;
     QPushButton  *m_saveButton;
 
-    int   m_colorIndex = 0;
+    int m_colorIndex = 0;
 
-    void setupToolbar();
-    void applyMetroStyle();
-    void updateColorSwatch();
-    QColor colorForIndex(int idx) const;
+    QWidget* buildToolbar();
+    QWidget* buildStatusBar();
+    void     applyMetroStyle();
+    void     updateColorSwatch();
+    QColor   colorForIndex(int idx) const;
 };
