@@ -21,11 +21,11 @@
 # [TP_7_Login_con_clima_y_fondo_de_pantalla](./ejercicio07_poo)
 - Un login que usa una API de OpenWeather para mostrar el clima. La página contiene datos aleatorios modificables.
 
-# [TP_8_editor_multilenguaje](./TP-10-T-rex)
+# [TP_8_editor_multilenguaje](./editor_multilenguaje)
 - Editor principal con selector de lenguaje: C++, Python y Java.
 
 # [TP_9-coordenadas_en_BD](./coordenadas_en_BD)
 - Un tablero de pintura al cual se le pueden configurar colores usando letras. Para más detalles, leer el README del proyecto.
 
-# [TP10-T-rex](./POO_1-Agostini)
+# [TP10-T-rex](./TP-10-T-rex)
 - un juego igual al t-rex de google que aparece cuando no hay conexion.
