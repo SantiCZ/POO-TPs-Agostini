@@ -9,23 +9,27 @@
 #include <QJsonObject>
 #include <QJsonArray>
 
-MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
+MainWindow::MainWindow(QWidget *parent) : QWidget(parent) {
     setWindowTitle("Kanban Lolo Pro - Dashboard");
     resize(1200, 800);
 
-    // Fondo general oscuro y moderno
-    this->setStyleSheet("QMainWindow { background-color: #1e1e2f; }");
+    this->setStyleSheet("QWidget#mainRoot { background-color: #1e1e2f; }");
+    setObjectName("mainRoot");
 
     QScrollArea *scroll = new QScrollArea(this);
     scroll->setWidgetResizable(true);
     scroll->setStyleSheet("QScrollArea { border: none; background-color: #1e1e2f; }");
-    setCentralWidget(scroll);
 
-    centralWidget = new QWidget();
-    scroll->setWidget(centralWidget);
-    layoutTablero = new QHBoxLayout(centralWidget);
+    QWidget *contenido = new QWidget();
+    layoutTablero = new QHBoxLayout(contenido);
     layoutTablero->setContentsMargins(20, 20, 20, 20);
     layoutTablero->setSpacing(25);
+
+    scroll->setWidget(contenido);
+
+    QVBoxLayout *rootLayout = new QVBoxLayout(this);
+    rootLayout->setContentsMargins(0, 0, 0, 0);
+    rootLayout->addWidget(scroll);
 
     manager = new QNetworkAccessManager(this);
 
@@ -102,7 +106,6 @@ void MainWindow::procesarRespuesta(QNetworkReply *reply) {
             timer->start(3000);
         });
 
-        // Colores de tarjetas según categoría
         QString cardBgColor = "#ffffff";
         if (nombreCol.toLower().contains("pendiente")) cardBgColor = "#ff7675";
         else if (nombreCol.toLower().contains("proceso")) cardBgColor = "#ffeaa7";
@@ -127,9 +130,8 @@ void MainWindow::procesarRespuesta(QNetworkReply *reply) {
 
                 QHBoxLayout *btnRow = new QHBoxLayout();
                 btnRow->setSpacing(10);
-                btnRow->setAlignment(Qt::AlignCenter); // Centrar los botones
+                btnRow->setAlignment(Qt::AlignCenter);
 
-                // --- BOTONES SOLICITADOS: BLANCOS, REDONDOS, ICONO NEGRO ---
                 QString styleBotones =
                     "QPushButton { "
                     "  background-color: white; "
@@ -141,11 +143,10 @@ void MainWindow::procesarRespuesta(QNetworkReply *reply) {
                     "} "
                     "QPushButton:hover { background-color: #f0f0f0; }";
 
-                // Botón MOVER
                 if (i < columnas.size() - 1) {
                     int idSiguiente = columnas[i+1].toObject()["id"].toInt();
                     QPushButton *m = new QPushButton("➜");
-                    m->setFixedSize(55, 30); // Rectángulo
+                    m->setFixedSize(55, 30);
                     m->setCursor(Qt::PointingHandCursor);
                     m->setStyleSheet(styleBotones);
                     btnRow->addWidget(m);
@@ -154,9 +155,8 @@ void MainWindow::procesarRespuesta(QNetworkReply *reply) {
                     });
                 }
 
-                // Botón BORRAR
                 QPushButton *b = new QPushButton("✕");
-                b->setFixedSize(55, 30); // Rectángulo
+                b->setFixedSize(55, 30);
                 b->setCursor(Qt::PointingHandCursor);
                 b->setStyleSheet(styleBotones);
                 btnRow->addWidget(b);
