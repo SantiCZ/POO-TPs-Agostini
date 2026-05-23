@@ -27,5 +27,5 @@
 # [TP_9-coordenadas_en_BD](./coordenadas_en_BD)
 - Un tablero de pintura al cual se le pueden configurar colores usando letras. Para más detalles, leer el README del proyecto.
 
-# [TP10-T-rex](./TP-10-T-rex)
+# [TP10-T-rex](./TP10-T-rex)
 - un juego igual al t-rex de google que aparece cuando no hay conexion.
